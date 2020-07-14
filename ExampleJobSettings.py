@@ -17,8 +17,9 @@ def scriptRunner():
     :return:
     """
     dealPriceChecker = jobDetails(jobName='TestJobCircle',scriptName='TimeWaster.py', scriptLocation='C:/pythonprojects/AdvancedPythonTopics', startHour=11, startMinute=28, intervalSeconds=10, cmdLineArgs="-s 20", runOnStart=True)
+    gitPull = jobDetails(fullCommand="git status", runDirectory="C:\pythonscripts\PurchasingScripts\DealScriptsSettingsZim", runOnStart=True, intervalSeconds=10)
 
-    listOfJobObjects = [dealPriceChecker]
+    listOfJobObjects = [dealPriceChecker, gitPull]
 
     processTotal = len(listOfJobObjects)
     print(f"LOG INFO: Processing {processTotal} jobs")

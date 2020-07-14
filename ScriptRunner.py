@@ -16,9 +16,19 @@ def get_os_python_cmd():
         cmd = "python"
     return cmd
 
+def get_home_dir():
+    opr_sys = platform.system()
+    if 'windows' in opr_sys.lower():
+        root_dir = "C:"
+    elif 'linux' in opr_sys.lower():
+        root_dir = "/home/zoeuser"
+    else:
+        root_dir = "C:"
+    return root_dir
+
 def notifier_script_run_monitor(msg, channel=None, weebhookUrl=None):
     # SENDS TO ZOEZIM WORKPACE
-    webhook_url_default = 'https://hooks.slack.com/services/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'
+    webhook_url_default = 'https://hooks.slack.com/services/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'
 
     if channel is None:
         channel = "#script_run_monitor"
@@ -41,7 +51,24 @@ def notifier_script_run_monitor(msg, channel=None, weebhookUrl=None):
 
 
 class jobDetails:
-    def __init__(self, scriptName, scriptLocation, startHour, startMinute=0, cmdLineArgs="",jobName = None, intervalSeconds=None, runOnStart=False, startDelay=None):
+    def __init__(self, scriptName=None, scriptLocation=None, startHour=12, startMinute=0, cmdLineArgs="",jobName = None, intervalSeconds=None, runOnStart=False, startDelay=None, fullCommand=None, runDirectory=None):
+        """
+        Can be used to run a specific python script at a specified path.
+        Can also be used to run a specific shell command if supplied.
+        If shell command is supplied, it will be run over the python script (using the runDirectory)
+        :param scriptName:
+        :param scriptLocation:
+        :param startHour:
+        :param startMinute:
+        :param cmdLineArgs:
+        :param jobName:
+        :param intervalSeconds:
+        :param runOnStart:
+        :param startDelay:
+        :param fullCommand:
+        :param runDirectory:
+        """
+
         # INTERVAL TIME IS GIVEN IN SECONDS
         self.scriptName = scriptName
         self.cmdLineArgs = cmdLineArgs
@@ -50,9 +77,20 @@ class jobDetails:
         self.startMinute = startMinute
         self.intervalSeconds = intervalSeconds
         self.runOnStart = runOnStart
+        self.fullCommand = fullCommand
+        self.runDirectory = runDirectory
+
+        if not self.scriptName:
+            self.scriptName =fullCommand
+
+        if not self.runDirectory:
+            self.runDirectory = get_home_dir()
+
+        if not self.scriptLocation:
+            self.scriptLocation = get_home_dir()
 
         if not jobName:
-            jobName = f"{scriptName} {cmdLineArgs}"
+            jobName = f"{self.scriptName} {cmdLineArgs}"
 
         self.jobName = jobName
 
@@ -71,6 +109,22 @@ class jobDetails:
         """
         startMsg = f"LOG MSG: Starting job {self.jobName}"
         notifier_script_run_monitor(msg=startMsg)
+
+        if self.fullCommand:
+            print(f"LOG INFO: Full Command Supplied will be run.")
+            try:
+                subprocess.call(self.fullCommand,cwd=self.runDirectory, shell=True)
+                endMsg = f"LOG SUCCESS: Job finished: {self.jobName}"
+                print(endMsg)
+                notifier_script_run_monitor(msg=endMsg)
+            except:
+                errorMsg = f"LOG ERROR: Failed to run file at {self.jobName}"
+                print(errorMsg)
+                notifier_script_run_monitor(errorMsg)
+                traceback.print_exc()
+            return
+
+
         fullCmd = f"{get_os_python_cmd()} {self.scriptName} {self.cmdLineArgs}"
         print(f"** RUNNING: {fullCmd}")
         try:
