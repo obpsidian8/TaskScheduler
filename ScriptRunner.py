@@ -28,7 +28,7 @@ def get_home_dir():
 
 def notifier_script_run_monitor(msg, channel=None, weebhookUrl=None):
     # SENDS TO ZOEZIM WORKPACE
-    webhook_url_default = 'https://hooks.slack.com/services/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'
+    webhook_url_default = 'https://hooks.slack.com/services/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'
 
     if channel is None:
         channel = "#script_run_monitor"
