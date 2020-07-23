@@ -6,6 +6,7 @@ import json
 import subprocess
 import platform
 
+
 def get_os_python_cmd():
     opr_sys = platform.system()
     if 'windows' in opr_sys.lower():
@@ -15,6 +16,7 @@ def get_os_python_cmd():
     else:
         cmd = "python"
     return cmd
+
 
 def get_home_dir():
     opr_sys = platform.system()
@@ -26,9 +28,10 @@ def get_home_dir():
         root_dir = "C:"
     return root_dir
 
+
 def notifier_script_run_monitor(msg, channel=None, weebhookUrl=None):
     # SENDS TO ZOEZIM WORKPACE
-    webhook_url_default = 'https://hooks.slack.com/services/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'
+    webhook_url_default = 'https://hooks.slack.com/services/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'
 
     if channel is None:
         channel = "#script_run_monitor"
@@ -48,10 +51,11 @@ def notifier_script_run_monitor(msg, channel=None, weebhookUrl=None):
                 'Request to slack returned an error %s, the response is:\n%s' % (response.status_code, response.text))
     except:
         print("Error sending run notification")
+        traceback.print_exc()
 
 
 class jobDetails:
-    def __init__(self, scriptName=None, scriptLocation=None, startHour=12, startMinute=0, cmdLineArgs="",jobName = None, intervalSeconds=None, runOnStart=False, startDelay=None, fullCommand=None, runDirectory=None):
+    def __init__(self, settingsDict: dict):
         """
         Can be used to run a specific python script at a specified path.
         Can also be used to run a specific shell command if supplied.
@@ -70,34 +74,19 @@ class jobDetails:
         """
 
         # INTERVAL TIME IS GIVEN IN SECONDS
-        self.scriptName = scriptName
-        self.cmdLineArgs = cmdLineArgs
-        self.scriptLocation = scriptLocation
-        self.startHour = startHour
-        self.startMinute = startMinute
-        self.intervalSeconds = intervalSeconds
-        self.runOnStart = runOnStart
-        self.fullCommand = fullCommand
-        self.runDirectory = runDirectory
+        self.jobName = settingsDict.get("JobName")
+        self.enabled = settingsDict.get("Enabled")
+        self.startHour = settingsDict.get("StartHour")
+        self.startMinute = settingsDict.get("StartMinute")
+        self.startSecond = settingsDict.get("StartSecond")
+        self.intervalSeconds = settingsDict.get("InstervalSeconds")
+        self.runOnStart = settingsDict.get("RunOnStart")
+        self.fullCommand = settingsDict.get("FullCommand")
+        self.runDirectory = settingsDict.get("RunDirectory")
+        self.startDelay = settingsDict.get("StartDelay")
 
-        if not self.scriptName:
-            self.scriptName =fullCommand
-
-        if not self.runDirectory:
-            self.runDirectory = get_home_dir()
-
-        if not self.scriptLocation:
-            self.scriptLocation = get_home_dir()
-
-        if not jobName:
-            jobName = f"{self.scriptName} {cmdLineArgs}"
-
-        self.jobName = jobName
-
-        if not startDelay:
-            startDelay = 0
-
-        self.startDelay = startDelay
+        if not self.startDelay:
+            self.startDelay = 0
 
     def run_job(self):
         """
@@ -113,7 +102,7 @@ class jobDetails:
         if self.fullCommand:
             print(f"LOG INFO: Full Command Supplied will be run.")
             try:
-                subprocess.call(self.fullCommand,cwd=self.runDirectory, shell=True)
+                subprocess.call(self.fullCommand, cwd=self.runDirectory, shell=True)
                 endMsg = f"LOG SUCCESS: Job finished: {self.jobName}"
                 print(endMsg)
                 notifier_script_run_monitor(msg=endMsg)
@@ -124,21 +113,10 @@ class jobDetails:
                 traceback.print_exc()
             return
 
-
-        fullCmd = f"{get_os_python_cmd()} {self.scriptName} {self.cmdLineArgs}"
-        print(f"** RUNNING: {fullCmd}")
-        try:
-            subprocess.call(fullCmd, cwd=self.scriptLocation, shell=True)
-            endMsg = f"LOG SUCCESS: Job finished: {self.jobName}"
-            print(endMsg)
-            notifier_script_run_monitor(msg=endMsg)
-        except:
-            errorMsg = f"LOG ERROR: Failed to run file at {self.jobName}"
-            print(errorMsg)
-            notifier_script_run_monitor(errorMsg)
-            traceback.print_exc()
-
     def scheduleJob(self):
+        if not self.enabled:
+            print(f"JOB NAME: {self.jobName} not enabled. Will not be run")
+            return
         """
         Handles the scheduling of the runs of the python scripts. Checks time every second, implements wait and intervals in running files
         :return:
@@ -165,21 +143,18 @@ class jobDetails:
                     # WAITING FOR INTERVAL FIRST TIME
                     for t in range(self.intervalSeconds, 0, -1):
                         time.sleep(1)
-                        print(f"LOG INFO: Waiting for time interval to run next instance of {self.jobName}. Time interval is {self.intervalSeconds} seconds.Timer  currently at {t}")
+                        print(
+                            f"LOG INFO: Waiting for time interval to run next instance of {self.jobName}. Time interval is {self.intervalSeconds} seconds.Timer  currently at {t}")
                     while True:
                         # INNER LOOP FOR INTERVAL
                         self.run_job()
                         # WAITING FOR SUBSEQUENT INTERVAL
                         for t in range(self.intervalSeconds, 0, -1):
                             time.sleep(1)
-                            print(f"LOG INFO: Waiting for time interval to run next instance of {self.jobName}. Time interval is {self.intervalSeconds} seconds.Timer  currently at {t}")
+                            print(
+                                f"LOG INFO: Waiting for time interval to run next instance of {self.jobName}. Time interval is {self.intervalSeconds} seconds.Timer  currently at {t}")
             else:
                 pass
 
             self.runOnStart = False
             print(f"LOG INFO: Will run next instance of {self.jobName} at next time {self.startHour}:{self.startMinute} hrs")
-
-
-
-
-
