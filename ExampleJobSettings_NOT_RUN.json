@@ -1,0 +1,26 @@
+[
+  {
+    "JobName": "GitStatus",
+    "FullCommand": "git status",
+    "Enabled": true,
+    "RunDirectory": "C:/pythonscripts/PurchasingScripts/DealScriptsSettingsZim",
+    "RunOnStart": true,
+    "StartHour": 11,
+    "StartMinute": 28,
+    "StartSecond": 10,
+    "InstervalSeconds": 10,
+    "StartDelay": null
+  },
+  {
+    "JobName": "TestJobCircle",
+    "FullCommand": "python TimeWaster.py -s 20",
+    "Enabled": true,
+    "RunDirectory": "C:/pythonscripts/PurchasingScripts/DealScriptsSettingsZim",
+    "RunOnStart": false,
+    "StartHour": null,
+    "StartMinute": null,
+    "StartSecond": null,
+    "InstervalSeconds": 10,
+    "StartDelay": null
+  }
+]
