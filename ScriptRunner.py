@@ -31,7 +31,7 @@ def get_home_dir():
 
 def notifier_script_run_monitor(msg, channel=None, weebhookUrl=None):
     # SENDS TO ZOEZIM WORKPACE
-    webhook_url_default = 'https://hooks.slack.com/services/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'
+    webhook_url_default = 'https://hooks.slack.com/services/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'
 
     if channel is None:
         channel = "#script_run_monitor"
@@ -79,7 +79,7 @@ class jobDetails:
         self.startHour = settingsDict.get("StartHour")
         self.startMinute = settingsDict.get("StartMinute")
         self.startSecond = settingsDict.get("StartSecond")
-        self.intervalSeconds = settingsDict.get("InstervalSeconds")
+        self.intervalSeconds = settingsDict.get("IntervalSeconds")
         self.runOnStart = settingsDict.get("RunOnStart")
         self.fullCommand = settingsDict.get("FullCommand")
         self.runDirectory = settingsDict.get("RunDirectory")

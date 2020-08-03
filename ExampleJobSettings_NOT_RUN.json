@@ -8,7 +8,7 @@
     "StartHour": 11,
     "StartMinute": 28,
     "StartSecond": 10,
-    "InstervalSeconds": 10,
+    "IntervalSeconds": 10,
     "StartDelay": null
   },
   {
@@ -20,7 +20,7 @@
     "StartHour": null,
     "StartMinute": null,
     "StartSecond": null,
-    "InstervalSeconds": 10,
+    "IntervalSeconds": 10,
     "StartDelay": null
   }
 ]

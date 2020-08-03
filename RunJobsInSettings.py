@@ -19,6 +19,7 @@ def scriptRunner():
     Run this file (not this example , but the actual job details files that follows this pattern) and the scripts specified will run on the pc its set up on
     :return:
     """
+
     jobSettings = json.load(open('JobSettings.json'))
 
     listOfJobObjects = [jobDetails(setting) for setting in jobSettings]
