@@ -20,7 +20,7 @@ def scriptRunner():
     :return:
     """
 
-    jobSettings = json.load(open('JobSettings.json'))
+    jobSettings = json.load(open('JobSettingsJson/JobSettings.json'))
 
     listOfJobObjects = [jobDetails(setting) for setting in jobSettings]
 
